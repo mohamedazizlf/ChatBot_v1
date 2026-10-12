@@ -32,12 +32,16 @@
     var body = document.createElement('div'); body.className = 'message-body';
     if (item.audio) { body.className = 'voice-message'; var audio = document.createElement('audio'); audio.controls = true; audio.src = item.audio; var label = document.createElement('span'); label.textContent = 'Voice message · ' + item.duration; body.append(audio, label); } else body.textContent = item.text;
     node.appendChild(body);
-    if (item.role === 'assistant') { var actions = document.createElement('div'); actions.className = 'message-actions'; [['copy', 'Copy message'], ['like', 'Like response'], ['sound', 'Read aloud'], ['refresh', 'Regenerate response']].forEach(function (action) { var button = document.createElement('button'); button.className = 'icon-button'; button.setAttribute('aria-label', action[1]); button.title = action[1]; button.innerHTML = icon(action[0]); button.onclick = function () {
-      if (action[0] === 'copy') { navigator.clipboard.writeText(item.text).then(function () { button.innerHTML = icon('check'); setTimeout(function () { button.innerHTML = icon('copy'); }, 1800); }).catch(function () { status.textContent = 'Your browser could not copy this message.'; }); }
-      if (action[0] === 'like') { button.classList.toggle('selected'); button.setAttribute('aria-pressed', String(button.classList.contains('selected'))); }
-      if (action[0] === 'sound') { if (!('speechSynthesis' in window)) { status.textContent = 'Read aloud is not available in this browser.'; return; } window.speechSynthesis.cancel(); window.speechSynthesis.speak(new SpeechSynthesisUtterance(item.text)); }
-      if (action[0] === 'refresh') { body.textContent = 'Thinking…'; setTimeout(function () { body.textContent = item.text; }, 700); }
-    }; actions.appendChild(button); }); node.appendChild(actions); }
+    if (item.role === 'assistant') {
+      var actions = document.createElement('div'); actions.className = 'message-actions';[['copy', 'Copy message'], ['like', 'Like response'], ['sound', 'Read aloud'], ['refresh', 'Regenerate response']].forEach(function (action) {
+        var button = document.createElement('button'); button.className = 'icon-button'; button.setAttribute('aria-label', action[1]); button.title = action[1]; button.innerHTML = icon(action[0]); button.onclick = function () {
+          if (action[0] === 'copy') { navigator.clipboard.writeText(item.text).then(function () { button.innerHTML = icon('check'); setTimeout(function () { button.innerHTML = icon('copy'); }, 1800); }).catch(function () { status.textContent = 'Your browser could not copy this message.'; }); }
+          if (action[0] === 'like') { button.classList.toggle('selected'); button.setAttribute('aria-pressed', String(button.classList.contains('selected'))); }
+          if (action[0] === 'sound') { if (!('speechSynthesis' in window)) { status.textContent = 'Read aloud is not available in this browser.'; return; } window.speechSynthesis.cancel(); window.speechSynthesis.speak(new SpeechSynthesisUtterance(item.text)); }
+          if (action[0] === 'refresh') { body.textContent = 'Thinking…'; setTimeout(function () { body.textContent = item.text; }, 700); }
+        }; actions.appendChild(button);
+      }); node.appendChild(actions);
+    }
     messages.appendChild(node);
   }
   function addMessage(item) { active.items.push(item); renderMessage(item); scrollDown(); }
@@ -61,7 +65,8 @@
     status.textContent = '';
     if (!navigator.mediaDevices || !window.MediaRecorder) { status.textContent = 'Voice recording needs a supported browser and a secure connection.'; return; }
     requesting = true; recordButton.disabled = true;
-    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); recorder = new MediaRecorder(stream); chunks = []; discarded = false; seconds = 0;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true }); recorder = new MediaRecorder(stream); chunks = []; discarded = false; seconds = 0;
       recorder.ondataavailable = function (event) { if (event.data.size > 0) chunks.push(event.data); };
       recorder.onstop = function () { releaseMic(); if (discarded) { resetRecording(); return; } var blob = new Blob(chunks, { type: recorder.mimeType }); pendingAudio = { url: URL.createObjectURL(blob), duration: timeLabel(seconds) }; recording = false; clearInterval(timer); panel.classList.add('ready'); document.getElementById('record-label').textContent = 'Ready to send'; recordButton.classList.remove('recording'); recordButton.setAttribute('aria-label', 'Recording ready'); document.querySelector('#record-icon use').setAttribute('href', '#mic'); syncInput(); if (recorder.sendAfterStop) form.requestSubmit(); };
       recorder.start(); recording = true; panel.hidden = false; document.getElementById('text-input-row').hidden = true; document.getElementById('record-label').textContent = 'Recording'; document.getElementById('record-time').textContent = '0:00'; recordButton.classList.add('recording'); recordButton.setAttribute('aria-label', 'Stop recording'); recordButton.title = 'Stop recording'; document.querySelector('#record-icon use').setAttribute('href', '#stop'); timer = setInterval(function () { seconds++; document.getElementById('record-time').textContent = timeLabel(seconds); }, 1000); syncInput();
