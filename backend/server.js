@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { marked } from 'marked';
+import sanitizeHtml from 'sanitize-html';
 
 dotenv.config();
 
@@ -83,7 +85,7 @@ ${JSON.stringify(products)}
             }
         );
 
-        const result = await response.json();
+        const result = await response.json()
 
         if (!response.ok) {
             return res.status(response.status).json(result);
@@ -92,8 +94,22 @@ ${JSON.stringify(products)}
         const assistantMessage =
             result.choices?.[0]?.message?.content || "";
 
+        const markdown = assistantMessage
+
+        const rawHtml = await marked.parse(markdown);
+
+        const cleanHtml = sanitizeHtml(rawHtml, {
+            allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+                'h1', 'h2', 'img'
+            ]),
+            allowedAttributes: {
+                ...sanitizeHtml.defaults.allowedAttributes,
+                img: ['src', 'alt', 'width', 'height']
+            }
+        });
+
         res.json({
-            message: assistantMessage
+            message: cleanHtml + ""
         });
 
     } catch (error) {
