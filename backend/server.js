@@ -36,16 +36,13 @@ const products = [
     }
 ];
 
-const conversation = [];
+var conversation = [];
 
 app.post("/chat", async (req, res) => {
     try {
-        const { message } = req.body;
+        const { messages } = req.body;
 
-        conversation.push({
-            role: "user",
-            content: message
-        });
+        conversation = messages
 
         const response = await fetch(
             "https://openrouter.ai/api/v1/chat/completions",
@@ -94,11 +91,6 @@ ${JSON.stringify(products)}
 
         const assistantMessage =
             result.choices?.[0]?.message?.content || "";
-
-        conversation.push({
-            role: "assistant",
-            content: assistantMessage
-        });
 
         res.json({
             message: assistantMessage

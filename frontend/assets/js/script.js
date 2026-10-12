@@ -1,5 +1,5 @@
 var messages = []
-var userMessage = document.querySelector("#message-input").value
+var userMessage = document.querySelector("#message-input")
 var messagesContainer = document.querySelector(".messages")
 var thinkingBot = `<article class="message assistant-message" id="thinkingMsg">
                         <span class="assistant-mark">
@@ -13,7 +13,7 @@ var thinkingBot = `<article class="message assistant-message" id="thinkingMsg">
                             </svg>
                         </div>
                     </article>`
-function sendChat() {
+async function sendChat() {
 
     if (messages.length === 0) {
         messagesContainer.style.display = "flex"
@@ -22,34 +22,52 @@ function sendChat() {
 
     }
 
+    messagesContainer.innerHTML += `<article class="message user-message">
+                        <div class="message-body">${userMessage.value}</div>
+                    </article>  `
+
+    messages.push({
+        role: "user",
+        content: userMessage.value
+    })
+
+    userMessage.value = ""
+
     messagesContainer.innerHTML += thinkingBot
 
-    setTimeout(() => {
-        document.querySelector("#thinkingMsg").remove()
-    }, 3000);
-
-    fetch('http://localhost:3000/chat', {
+    const response = await fetch('http://localhost:3000/chat', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            message: 'Bonjour',
-            userId: 123
+            messages: messages
         })
     })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error: ${response.status}`);
-            }
-            return response.json();
-        })
 
+    const res = await response.json()
 
+    console.log(res)
+
+    messages.push({
+        role: "assistant",
+        content: res.message
+    })
+
+    document.querySelector("#thinkingMsg").remove()
+
+    messagesContainer.innerHTML += `<article class="message assistant-message">
+                        <span class="assistant-mark">
+                            <svg aria-hidden="true">
+                                <use href="#spark"></use>
+                            </svg>
+                        </span>
+                        <div class="message-body">${res.message}</div>
+                    </article>`
 }
 
 function userWriting() {
-    if (userMessage === "") {
+    if (userMessage.value === "") {
         document.querySelector(".send-button").disabled = true
     } else {
         document.querySelector(".send-button").disabled = false
