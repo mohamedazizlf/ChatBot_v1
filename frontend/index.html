@@ -8,8 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 
 <body>
@@ -70,72 +69,71 @@
             <symbol id="check" viewBox="0 0 24 24">
                 <path d="m5 12 4 4L19 6" />
             </symbol>
+            <symbol id="thinking" viewBox="0 0 24 24">
+                <circle cx="5" cy="12" r="2" fill="currentColor">
+                    <animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" repeatCount="indefinite"
+                        begin="0s" />
+                </circle>
+                <circle cx="12" cy="12" r="2" fill="currentColor">
+                    <animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" repeatCount="indefinite"
+                        begin="0.2s" />
+                </circle>
+                <circle cx="19" cy="12" r="2" fill="currentColor">
+                    <animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" repeatCount="indefinite"
+                        begin="0.4s" />
+                </circle>
+            </symbol>
         </defs>
     </svg>
     <div class="app" style="justify-content: center;">
-        <main style="width: auto;margin-left: 0;">
+        <main style="width: auto;margin: 2%;">
             <div class="main-body" id="main-body" style="width: 100%;">
-                <section class="welcome" id="welcome">
-                    <div class="welcome-mark">
-                        <svg>
-                            <use href="#spark" />
-                        </svg>
-                        <span class="small-spark">✦</span>
-                    </div>
-                    <p class="eyebrow">A SPACE FOR YOUR IDEAS</p>
-                    <h1>What's on your mind?</h1>
-                    <p class="welcome-subtitle">Big questions, little thoughts, or a spark of inspiration.</p>
+                <section class="messages">
+                    <article class="message user-message">
+                        <div class="message-body">yetr</div>
+                    </article>
+                    <article class="message assistant-message">
+                        <span class="assistant-mark">
+                            <svg aria-hidden="true">
+                                <use href="#spark"></use>
+                            </svg>
+                        </span>
+                        <div class="message-body">That’s a good place to start. Let’s think it through together.
+
+                            What would a useful outcome look like for you? Share a little more context, and we can break
+                            it down into something clear and manageable.</div>
+                    </article>
+                    
                 </section>
-                <section class="messages" id="messages" aria-label="Conversation" aria-live="polite"></section>
-                <div class="input-area" id="input-area">
-                    <form id="chat-form" class="composer">
+                <div class="input-area">
+                    <div class="composer">
                         <div class="text-input-row" id="text-input-row">
                             <textarea id="message-input" placeholder="Ask anything, or think out loud…" rows="1"
-                                aria-label="Your message"></textarea>
-                        </div>
-                        <div class="recording-panel" id="recording-panel" hidden>
-                            <span class="record-dot"></span>
-                            <span id="record-label">Recording</span>
-                            <div class="waveform" aria-hidden="true">
-                                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-                            </div>
-                            <span id="record-time">0:00</span>
-                            <button type="button" class="icon-button" id="cancel-recording"
-                                aria-label="Discard recording">
-                                <svg>
-                                    <use href="#close" />
-                                </svg>
-                            </button>
+                                oninput="userWriting()" style="height: 38px;"></textarea>
                         </div>
                         <div class="composer-bottom">
                             <button type="button" class="thinking-mode" id="thinking-mode" aria-pressed="false">
                                 <svg>
-                                    <use href="#spark" />
+                                    <use href="#spark"></use>
                                 </svg>Think deeper
                             </button>
                             <div class="send-controls">
                                 <span class="enter-hint">Let's make something of it</span>
-                                <button type="button" class="icon-button record-button" id="record-button"
-                                    aria-label="Record voice message" title="Record voice message">
-                                    <svg id="record-icon">
-                                        <use href="#mic" />
-                                    </svg>
-                                </button>
-                                <button class="send-button" type="submit" id="send-button" aria-label="Send message"
-                                    title="Send message" disabled><svg>
-                                        <use href="#arrow" />
+                                <button class="send-button" type="submit" onclick="sendChat()" disabled>
+                                    <svg>
+                                        <use href="#arrow"></use>
                                     </svg>
                                 </button>
                             </div>
                         </div>
-                    </form>
+                    </div>
                     <p class="status-message" id="status-message" role="status"></p>
-                    <div class="suggestions" id="suggestions">
+                    <div class="suggestions">
                         <button class="suggestion"
                             data-prompt="Help me brainstorm a fresh idea for a creative project.">
                             <span class="suggestion-icon idea">
                                 <svg>
-                                    <use href="#bulb" />
+                                    <use href="#bulb"></use>
                                 </svg>
                             </span>
                             <span>
@@ -145,13 +143,13 @@
                                 </small>
                             </span>
                             <svg class="suggestion-arrow">
-                                <use href="#chevron" />
+                                <use href="#chevron"></use>
                             </svg>
                         </button>
                         <button class="suggestion" data-prompt="Help me write a thoughtful message.">
                             <span class="suggestion-icon write">
                                 <svg>
-                                    <use href="#compose" />
+                                    <use href="#compose"></use>
                                 </svg>
                             </span>
                             <span>
@@ -161,13 +159,13 @@
                                 </small>
                             </span>
                             <svg class="suggestion-arrow">
-                                <use href="#chevron" />
+                                <use href="#chevron"></use>
                             </svg>
                         </button>
                         <button class="suggestion" data-prompt="Explain something interesting about the world.">
                             <span class="suggestion-icon explore">
                                 <svg>
-                                    <use href="#globe" />
+                                    <use href="#globe"></use>
                                 </svg>
                             </span>
                             <span>
@@ -176,7 +174,7 @@
                                     a topic</small>
                             </span>
                             <svg class="suggestion-arrow">
-                                <use href="#chevron" />
+                                <use href="#chevron"></use>
                             </svg>
                         </button>
                     </div>
@@ -184,6 +182,10 @@
             </div>
         </main>
     </div>
+
+
+    <script src="./assets/js/script.js"></script>
+
 </body>
 
 </html>
